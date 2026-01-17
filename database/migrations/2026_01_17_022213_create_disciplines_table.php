@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('clients', function (Blueprint $table) {
+        Schema::create('disciplines', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->date('birth_date')->nullable();
-            $table->enum('status', ['active', 'expired'])->default('active');
+            $table->string('nom');
+            $table->string('img')->nullable();
+            $table->float('prix');
             $table->timestamps();
         });
-
     }
 
     /**
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('clients');
+        Schema::dropIfExists('disciplines');
     }
 };

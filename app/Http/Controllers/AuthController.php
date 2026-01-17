@@ -3,67 +3,42 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\LoginRequest;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\RegisterRequest;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
-        ]);
-
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role' => 'client'
+            'email'=> $request->email,
+            'password'=> bcrypt($request->password),
+            'role'=> 'client'
         ]);
 
-        Client::create([
-            'user_id' => $user->id
-        ]);
+        $token = $user->createToken('api')->plainTextToken;
 
-        return response()->json([
-            'message' => 'Inscription réussie'
-        ], 201);
+        return response()->json(compact('user','token'),201);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'message' => 'Email ou mot de passe incorrect'
-            ], 401);
+        if (!Auth::attempt($request->only('email','password'))) {
+            return response()->json(['message'=>'Invalid credentials'],401);
         }
 
-        $token = $user->createToken('gym-token')->plainTextToken;
+        $user = Auth::user();
+        $token = $user->createToken('api')->plainTextToken;
 
-        return response()->json([
-            'message' => 'Connexion réussie',
-            'token' => $token,
-            'user' => $user,
-            'role' => $user->role
-        ]);
+        return response()->json(compact('user','token'));
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'message' => 'Déconnexion réussie'
-        ]);
+        $request->user()->tokens()->delete();
+        return response()->json(['message'=>'Logged out']);
     }
 }
