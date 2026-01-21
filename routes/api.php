@@ -16,7 +16,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:admin')->group(function () {
         Route::apiResource('disciplines',DisciplineController::class);
-        Route::apiResource('coaches',CoachController::class);
+        Route::get('coaches',[CoachController::class,'index']);
+        Route::get('coaches/{id}',[CoachController::class,'show']);
+        Route::post('coaches',[CoachController::class,'store']);
+        Route::put('coaches/{id}',[CoachController::class,'update']);
+        Route::delete('coaches/{id}',[CoachController::class,'destroy']);
         Route::apiResource('abonnements',AbonnementController::class);
 
         Route::get('reservations',[ReservationController::class,'index']);
@@ -24,11 +28,12 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:client')->group(function () {
+        Route::get('discipline',[DisciplineController::class,'index']);
+        Route::get('abonnements/discipline/{id}',[AbonnementController::class,'byDiscipline']);
         Route::post('reservations',[ReservationController::class,'store']);
         Route::get('my-reservations',[ReservationController::class,'myReservations']);
         Route::put('reservations/{id}/cancel',[ReservationController::class,'cancel']);
     });
 });
 
-Route::get('disciplines',[DisciplineController::class,'index']);
-Route::get('abonnements/discipline/{id}',[AbonnementController::class,'byDiscipline']);
+

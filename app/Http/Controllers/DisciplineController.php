@@ -8,38 +8,84 @@ use App\Http\Requests\DisciplineRequest;
 
 class DisciplineController extends Controller
 {
+    // عرض كل الـ disciplines مع العلاقات
     public function index()
     {
-        return Discipline::with('abonnements','coaches')->get();
+        $disciplines = Discipline::with(['abonnements', 'coachs'])->get();
+
+        return response()->json([
+            'success' => true,
+            'disciplines' => $disciplines
+        ]);
     }
 
+    // إضافة discipline جديد
     public function store(DisciplineRequest $request)
     {
         $data = $request->validated();
-        if ($request->hasFile('img')) {
-            $data['img'] = uploadImage($request->img,'disciplines');
-        }
-        $data['user_id'] = auth()->id();
 
-        return Discipline::create($data);
+        if ($request->hasFile('img')) {
+            $data['img'] = $this->uploadImage($request->file('img'), 'disciplines');
+        }
+
+        $discipline = Discipline::create($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Discipline created successfully',
+            'discipline' => $discipline
+        ]);
     }
 
-    public function update(DisciplineRequest $request,$id)
+    // تعديل discipline موجود
+    public function update(DisciplineRequest $request, $id)
     {
-        $d = Discipline::findOrFail($id);
+        $discipline = Discipline::findOrFail($id);
         $data = $request->validated();
 
         if ($request->hasFile('img')) {
-            $data['img'] = uploadImage($request->img,'disciplines');
+            $data['img'] = $this->uploadImage($request->file('img'), 'disciplines');
         }
 
-        $d->update($data);
-        return $d;
+        $discipline->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Discipline updated successfully',
+            'discipline' => $discipline
+        ]);
     }
 
+    public function show($id)
+    {
+        $discipline = Discipline::with(['abonnements', 'coachs'])->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'discipline' => $discipline
+        ]);
+    }
+
+    // حذف discipline
     public function destroy($id)
     {
-        Discipline::destroy($id);
-        return response()->json(['message'=>'Deleted']);
+        $discipline = Discipline::findOrFail($id);
+        $discipline->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Discipline deleted successfully'
+        ]);
+    }
+
+    // دالة مساعدة لتحميل الصور
+    private function uploadImage($image, $folder)
+    {
+        $path = $image->store($folder, 'public');
+        //$path = $image->file('img')->store('images', 'public');
+        //$validated['img'] = $path;
+        //$filename = time() . '_' . $image->getClientOriginalName();
+        //$image->storeAs('public/' . $folder, $filename);
+        return $path;
     }
 }

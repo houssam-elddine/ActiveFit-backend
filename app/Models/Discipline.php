@@ -12,7 +12,7 @@ class Discipline extends Model
         return $this->hasMany(Abonnement::class);
     }
 
-    public function coaches() {
+    public function coachs() {
         return $this->hasMany(Coach::class);
     }
 }

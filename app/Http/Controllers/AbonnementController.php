@@ -7,50 +7,85 @@ use Illuminate\Http\Request;
 
 class AbonnementController extends Controller
 {
+    // عرض كل الاشتراكات
     public function index()
     {
-        return Abonnement::with('discipline')->get();
+        $abonnements = Abonnement::with('discipline')->get();
+
+        return response()->json([
+            'success' => true,
+            'abonnements' => $abonnements
+        ]);
     }
 
+    // إضافة اشتراك
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nom'=>'required',
-            'prix'=>'required|numeric',
-            'discipline_id'=>'required|exists:disciplines,id'
+            'nom' => 'required|string',
+            'prix' => 'required|numeric',
+            'discipline_id' => 'required|exists:disciplines,id'
         ]);
 
-        return Abonnement::create($data);
+        $abonnement = Abonnement::create($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Abonnement created successfully',
+            'abonnement' => $abonnement
+        ], 201);
     }
 
+    // عرض اشتراك واحد
     public function show($id)
     {
-        return Abonnement::with('discipline')->findOrFail($id);
+        $abonnement = Abonnement::with('discipline')->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'abonnement' => $abonnement
+        ]);
     }
 
-    public function update(Request $request,$id)
+    // تعديل اشتراك
+    public function update(Request $request, $id)
     {
-        $ab = Abonnement::findOrFail($id);
+        $abonnement = Abonnement::findOrFail($id);
 
         $data = $request->validate([
-            'nom'=>'required',
-            'prix'=>'required|numeric',
-            'discipline_id'=>'required|exists:disciplines,id'
+            'nom' => 'required|string',
+            'prix' => 'required|numeric',
+            'discipline_id' => 'required|exists:disciplines,id'
         ]);
 
-        $ab->update($data);
-        return $ab;
+        $abonnement->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Abonnement updated successfully',
+            'abonnement' => $abonnement
+        ]);
     }
 
+    // حذف اشتراك
     public function destroy($id)
     {
-        Abonnement::destroy($id);
-        return response()->json(['message'=>'Abonnement deleted']);
+        Abonnement::findOrFail($id)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Abonnement deleted successfully'
+        ]);
     }
 
-    // PUBLIC
+    // PUBLIC - اشتراكات حسب discipline
     public function byDiscipline($id)
     {
-        return Abonnement::where('discipline_id',$id)->get();
+        $abonnements = Abonnement::where('discipline_id', $id)->get();
+
+        return response()->json([
+            'success' => true,
+            'abonnements' => $abonnements
+        ]);
     }
 }
