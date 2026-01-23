@@ -12,7 +12,7 @@ class ReservationController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'coach_id' => 'nullable|exists:users,id',
+            'coach_id' => 'nullable|exists:coaches,id',
             'abonnement_id' => 'required|exists:abonnements,id',
             'numer_telephone' => 'required|string'
         ]);
