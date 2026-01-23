@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('abonnement_id')->constrained()->onDelete('cascade');
             $table->foreignId('client_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('coach_id')->nullable()->constrained()->onDelete('set null');
             $table->string('numer_telephone');
             $table->float('prix');
             $table->enum('status', ['en attente', 'confirmer', 'annuler'])->default('en attente');

@@ -91,4 +91,13 @@ class CoachController extends Controller
         return $path;
     }
 
+    public function byDiscipline($id)
+    {
+        $coaches = Coach::where('discipline_id', $id)->with('discipline')->get();
+
+        return response()->json([
+            'success' => true,
+            'coaches' => $coaches
+        ]);
+    }
 }

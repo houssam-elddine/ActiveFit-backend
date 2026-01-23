@@ -9,6 +9,7 @@ class Reservation extends Model
     protected $fillable = [
         'abonnement_id',
         'client_id',
+        'coach_id',
         'numer_telephone',
         'prix',
         'status'
@@ -20,6 +21,10 @@ class Reservation extends Model
 
     public function client() {
         return $this->belongsTo(User::class,'client_id');
+    }
+
+    public function coach() {
+        return $this->belongsTo(User::class,'coach_id');
     }
 }
 

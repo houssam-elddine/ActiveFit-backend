@@ -8,7 +8,6 @@ use App\Http\Requests\DisciplineRequest;
 
 class DisciplineController extends Controller
 {
-    // عرض كل الـ disciplines مع العلاقات
     public function index()
     {
         $disciplines = Discipline::with(['abonnements', 'coachs'])->get();
@@ -19,7 +18,6 @@ class DisciplineController extends Controller
         ]);
     }
 
-    // إضافة discipline جديد
     public function store(DisciplineRequest $request)
     {
         $data = $request->validated();
@@ -37,7 +35,6 @@ class DisciplineController extends Controller
         ]);
     }
 
-    // تعديل discipline موجود
     public function update(DisciplineRequest $request, $id)
     {
         $discipline = Discipline::findOrFail($id);
@@ -66,7 +63,6 @@ class DisciplineController extends Controller
         ]);
     }
 
-    // حذف discipline
     public function destroy($id)
     {
         $discipline = Discipline::findOrFail($id);
@@ -78,7 +74,6 @@ class DisciplineController extends Controller
         ]);
     }
 
-    // دالة مساعدة لتحميل الصور
     private function uploadImage($image, $folder)
     {
         $path = $image->store($folder, 'public');

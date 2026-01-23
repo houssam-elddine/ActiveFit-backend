@@ -12,6 +12,7 @@ class ReservationController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
+            'coach_id' => 'nullable|exists:users,id',
             'abonnement_id' => 'required|exists:abonnements,id',
             'numer_telephone' => 'required|string'
         ]);
@@ -21,6 +22,7 @@ class ReservationController extends Controller
         $reservation = Reservation::create([
             'abonnement_id' => $abonnement->id,
             'client_id' => auth()->id(),
+            'coach_id' => $data['coach_id'] ?? null,
             'numer_telephone' => $data['numer_telephone'],
             'prix' => $abonnement->prix,
             'status' => 'en attente'
@@ -38,7 +40,7 @@ class ReservationController extends Controller
     {
         $reservations = auth()->user()
             ->reservations()
-            ->with(['abonnement', 'abonnement.discipline.coaches'])
+            ->with(['abonnement', 'abonnement.discipline', 'coach'])
             ->get();
 
         return response()->json([

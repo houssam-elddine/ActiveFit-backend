@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:client')->group(function () {
         Route::get('discipline',[DisciplineController::class,'index']);
         Route::get('abonnements/discipline/{id}',[AbonnementController::class,'byDiscipline']);
+        Route::get('coaches/discipline/{id}',[CoachController::class,'byDiscipline']);
         Route::post('reservations',[ReservationController::class,'store']);
         Route::get('my-reservations',[ReservationController::class,'myReservations']);
         Route::put('reservations/{id}/cancel',[ReservationController::class,'cancel']);
